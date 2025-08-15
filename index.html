@@ -1,23 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-    <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-  import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js';
-  
-  const firebaseConfig = {
-     databaseURL: "https://llacak-juang-rw6-default-rtdb.asia-southeast1.firebasedatabase.app""
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
-  
-  // Export untuk digunakan di script utama
-  window.firebaseDB = database;
-  window.firebaseRef = ref;
-  window.firebaseSet = set;
-  window.firebaseGet = get;
-</script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f5a3c1619a8336',t:'MTc1NTIyODkwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +10,13 @@
         .gradient-bg {
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen">
@@ -35,13 +24,13 @@
     <div class="bg-white shadow-lg">
         <div class="container mx-auto px-4 py-6">
             <h1 class="text-3xl font-bold text-red-600 text-center">LACAK JUANG RW 6</h1>
-            <p class="text-center text-gray-600 mt-2">Lingkungan Garung - Sistem Penilaian</p>
+            <p class="text-center text-gray-600 mt-2">Lingkungan Garung - Sistem Penilaian Real-time</p>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
-        <!-- Login Section (Initially Hidden) -->
+        <!-- Login Section -->
         <div id="loginSection" class="hidden bg-white rounded-lg shadow-xl p-8 max-w-md mx-auto mb-8">
             <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Login Petugas</h2>
             <form id="loginForm">
@@ -67,16 +56,16 @@
                 <button onclick="showLogin()" class="bg-white hover:bg-gray-100 text-red-600 font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200">
                     Login Petugas
                 </button>
-                <button onclick="refreshScores()" class="bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200">
-                    Refresh Skor
+                <button onclick="refreshData()" class="bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200">
+                    Refresh Data
                 </button>
             </div>
             
-            <!-- Cloud Status -->
+            <!-- Firebase Status -->
             <div class="text-center mb-4">
-                <div id="syncStatus" class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg text-sm">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                    <span id="syncStatusText">Data tersinkron real-time antar perangkat</span>
+                <div id="firebaseStatus" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm">
+                    <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 pulse-dot"></div>
+                    <span>Menghubungkan ke Firebase...</span>
                 </div>
                 <div class="text-xs text-gray-500 mt-1">
                     Terakhir update: <span id="lastUpdateTime">-</span>
@@ -133,7 +122,7 @@
 
             <!-- Chart -->
             <div class="bg-white rounded-lg shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Grafik Perolehan Skor</h2>
+                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">📊 Grafik Perolehan Skor</h2>
                 <div class="relative h-96">
                     <canvas id="scoresChart"></canvas>
                 </div>
@@ -150,35 +139,24 @@
                     </button>
                 </div>
                 
-                <!-- Export Data -->
+                <!-- Admin Controls -->
                 <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h3 class="text-lg font-bold text-gray-700 mb-3">Export Data ke Spreadsheet</h3>
-                    <p class="text-sm text-gray-600 mb-3">Untuk menyimpan data ke spreadsheet yang dapat diakses siapapun:</p>
-                    <ol class="text-sm text-gray-600 mb-4 list-decimal list-inside space-y-1">
-                        <li>Buat Google Sheets baru di Google Drive</li>
-                        <li>Klik tombol "Copy Data CSV" di bawah</li>
-                        <li>Paste data ke Google Sheets</li>
-                        <li>Set sharing ke "Anyone with link can view"</li>
-                    </ol>
-                    <button onclick="copyToClipboard()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
-                        Copy Data CSV
-                    </button>
-                    <div id="copySuccess" class="hidden mt-2 text-green-600 text-sm">Data berhasil dicopy ke clipboard!</div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-3">Kontrol Admin</h3>
+                    <div class="space-x-4">
+                        <button onclick="exportData()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                            Export Data CSV
+                        </button>
+                        <button onclick="resetAllScores()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
+                            Reset Semua Skor
+                        </button>
+                        <button onclick="forceSync()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                            Force Sync
+                        </button>
+                    </div>
+                    <div id="adminMessage" class="hidden mt-4 p-3 rounded text-center"></div>
                 </div>
 
-                <!-- Sync and Reset Controls -->
-                <div class="mb-6 space-x-4">
-                    <button onclick="manualSync()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-                        Sync ke Google Sheets
-                    </button>
-                    <button onclick="resetAllScores()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
-                        Reset Semua Skor
-                    </button>
-                </div>
-                
-                <div id="syncStatus" class="hidden mb-4 p-3 rounded text-center"></div>
-
-                <!-- Same standings table and chart as public view -->
+                <!-- Same standings table as public view -->
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead>
@@ -204,7 +182,7 @@
 
             <!-- Admin Chart -->
             <div class="bg-white rounded-lg shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Grafik Perolehan Skor</h2>
+                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">📊 Grafik Admin</h2>
                 <div class="relative h-96">
                     <canvas id="adminScoresChart"></canvas>
                 </div>
@@ -258,14 +236,11 @@
                     </button>
                 </div>
 
-                <div id="saveSuccess" class="hidden mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded text-center">
-                    Skor berhasil disimpan!
-                </div>
+                <div id="saveMessage" class="hidden mt-4 p-3 rounded text-center"></div>
             </div>
 
             <!-- Results View for Pos -->
             <div id="posResults" class="hidden space-y-6">
-                <!-- Standings Table -->
                 <div class="bg-white rounded-lg shadow-xl p-6">
                     <h3 class="text-xl font-bold text-red-600 mb-4">Hasil Penilaian</h3>
                     <div class="overflow-x-auto">
@@ -291,9 +266,8 @@
                     </div>
                 </div>
 
-                <!-- Chart for Pos -->
                 <div class="bg-white rounded-lg shadow-xl p-6">
-                    <h3 class="text-xl font-bold text-red-600 mb-4">Grafik Klasemen Sementara</h3>
+                    <h3 class="text-xl font-bold text-red-600 mb-4">📊 Grafik Pos</h3>
                     <div class="relative h-80">
                         <canvas id="posScoresChart"></canvas>
                     </div>
@@ -303,7 +277,13 @@
     </div>
 
     <script>
-        // Data structure to store scores
+        // Firebase Configuration
+        const FIREBASE_CONFIG = {
+            databaseURL: "https://llacak-juang-rw6-default-rtdb.firebaseio.com",
+            projectId: "llacak-juang-rw6"
+        };
+
+        // Data structure
         let scores = {
             pbb: [0, 0, 0, 0, 0, 0],
             emponempon: [0, 0, 0, 0, 0, 0],
@@ -314,48 +294,94 @@
             posinduk: [0, 0, 0, 0, 0, 0]
         };
 
-        // Load scores from localStorage and cloud
-        async function loadScores() {
-            updateSyncStatus('loading', 'Memuat data...');
-            
-            // First try to load from cloud
-            const cloudLoaded = await loadFromCloud();
-            
-            if (!cloudLoaded) {
-                // Fallback to localStorage
-                const savedScores = localStorage.getItem('lacakJuangScores');
-                if (savedScores) {
-                    scores = JSON.parse(savedScores);
-                    updateSyncStatus('offline', 'Mode offline - data dari perangkat lokal');
+        // User credentials
+        const users = {
+            'admin': { password: 'admin123', role: 'admin' },
+            'pospbb': { password: 'pbb123', role: 'pos', pos: 'pbb', title: 'Pos PBB' },
+            'posemponempon': { password: 'empon123', role: 'pos', pos: 'emponempon', title: 'Pos Empon-empon' },
+            'possejarah': { password: 'sejarah123', role: 'pos', pos: 'sejarah', title: 'Pos Sejarah' },
+            'pospengetahuan': { password: 'pengetahuan123', role: 'pos', pos: 'pengetahuan', title: 'Pos Pengetahuan Umum' },
+            'posmakam': { password: 'makam123', role: 'pos', pos: 'makam', title: 'Pos Makam' },
+            'posoutbond': { password: 'outbond123', role: 'pos', pos: 'outbond', title: 'Pos Outbond' },
+            'posinduk': { password: 'posinduk123', role: 'pos', pos: 'posinduk', title: 'Pos Induk' }
+        };
+
+        let currentUser = null;
+        let publicChart = null;
+        let adminChart = null;
+        let posChart = null;
+        let firebaseConnected = false;
+
+        // Firebase Database Functions
+        async function saveToFirebase(data) {
+            try {
+                const response = await fetch(`${FIREBASE_CONFIG.databaseURL}/lacak-juang.json`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        scores: data,
+                        lastUpdated: new Date().toISOString(),
+                        timestamp: Date.now()
+                    })
+                });
+
+                if (response.ok) {
+                    updateFirebaseStatus('connected', 'Tersinkron dengan Firebase Real-time');
+                    updateLastUpdateTime();
+                    return true;
                 } else {
-                    updateSyncStatus('offline', 'Tidak ada data tersimpan');
+                    throw new Error('Firebase save failed');
                 }
-            } else {
-                updateSyncStatus('online', 'Data tersinkron real-time antar perangkat');
-                updateLastUpdateTime();
+            } catch (error) {
+                console.error('Firebase save error:', error);
+                updateFirebaseStatus('error', 'Gagal menyimpan ke Firebase');
+                return false;
             }
-            
-            // Always save to localStorage for offline access
-            saveScoresToStorage();
         }
 
-        // Update sync status indicator
-        function updateSyncStatus(status, message) {
-            const statusDiv = document.getElementById('syncStatus');
-            const statusText = document.getElementById('syncStatusText');
-            
-            if (!statusDiv || !statusText) return;
-            
-            statusText.textContent = message;
-            
-            // Reset classes
+        async function loadFromFirebase() {
+            try {
+                const response = await fetch(`${FIREBASE_CONFIG.databaseURL}/lacak-juang.json`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.scores) {
+                        scores = data.scores;
+                        updateFirebaseStatus('connected', 'Data dimuat dari Firebase');
+                        updateLastUpdateTime();
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('Firebase load error:', error);
+                updateFirebaseStatus('error', 'Gagal memuat dari Firebase');
+                return false;
+            }
+        }
+
+        // Update Firebase status indicator
+        function updateFirebaseStatus(status, message) {
+            const statusDiv = document.getElementById('firebaseStatus');
+            if (!statusDiv) return;
+
             statusDiv.className = 'inline-flex items-center px-4 py-2 rounded-lg text-sm';
             
             switch(status) {
-                case 'online':
+                case 'connected':
                     statusDiv.classList.add('bg-green-100', 'text-green-800');
                     statusDiv.innerHTML = `
-                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                        <div class="w-2 h-2 bg-green-500 rounded-full mr-2 pulse-dot"></div>
+                        <span>${message}</span>
+                    `;
+                    firebaseConnected = true;
+                    break;
+                case 'connecting':
+                    statusDiv.classList.add('bg-blue-100', 'text-blue-800');
+                    statusDiv.innerHTML = `
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 pulse-dot"></div>
                         <span>${message}</span>
                     `;
                     break;
@@ -365,13 +391,7 @@
                         <div class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
                         <span>${message}</span>
                     `;
-                    break;
-                case 'loading':
-                    statusDiv.classList.add('bg-blue-100', 'text-blue-800');
-                    statusDiv.innerHTML = `
-                        <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-spin"></div>
-                        <span>${message}</span>
-                    `;
+                    firebaseConnected = false;
                     break;
                 case 'error':
                     statusDiv.classList.add('bg-red-100', 'text-red-800');
@@ -379,6 +399,7 @@
                         <div class="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                         <span>${message}</span>
                     `;
+                    firebaseConnected = false;
                     break;
             }
         }
@@ -392,146 +413,49 @@
             }
         }
 
-        // Save scores to localStorage and cloud
+        // Save scores with Firebase sync
         async function saveScoresToStorage() {
-            // Save to localStorage
+            // Save to localStorage first
             localStorage.setItem('lacakJuangScores', JSON.stringify(scores));
             
-            // Save to cloud storage
-            const cloudSaved = await saveToCloud();
+            // Then sync to Firebase
+            const firebaseSaved = await saveToFirebase(scores);
             
-            if (cloudSaved) {
-                updateSyncStatus('online', 'Data tersinkron real-time antar perangkat');
-                updateLastUpdateTime();
-            } else {
-                updateSyncStatus('offline', 'Data disimpan lokal - sinkronisasi gagal');
+            if (!firebaseSaved) {
+                updateFirebaseStatus('offline', 'Data disimpan lokal - Firebase offline');
             }
+            
+            return firebaseSaved;
         }
 
-        // Cloud storage configuration - JSONBin.io untuk sinkronisasi real-time
-        const CLOUD_STORAGE = {
-            binId: '676a8e5ead19ca34f8c8f8a1',
-            apiKey: '$2a$10$VvKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKzKz',
-            baseUrl: 'https://api.jsonbin.io/v3/b/',
-            enabled: true
-        };
-
-        // Save scores to cloud storage
-        async function saveToCloud() {
-            if (!CLOUD_STORAGE.enabled) return false;
+        // Load scores with Firebase priority
+        async function loadScores() {
+            updateFirebaseStatus('connecting', 'Menghubungkan ke Firebase...');
             
-            try {
-                // Gunakan Firebase Realtime Database sebagai alternatif
-                const firebaseUrl = 'https://lacak-juang-rw6-default-rtdb.firebaseio.com/scores.json';
-                
-                const response = await fetch(firebaseUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        scores: scores,
-                        lastUpdated: new Date().toISOString(),
-                        version: Date.now()
-                    })
-                });
-                
-                if (response.ok) {
-                    console.log('Successfully saved to cloud storage');
-                    return true;
+            // Try Firebase first
+            const firebaseLoaded = await loadFromFirebase();
+            
+            if (!firebaseLoaded) {
+                // Fallback to localStorage
+                const savedScores = localStorage.getItem('lacakJuangScores');
+                if (savedScores) {
+                    scores = JSON.parse(savedScores);
+                    updateFirebaseStatus('offline', 'Mode offline - data lokal');
                 } else {
-                    console.error('Failed to save to cloud storage');
-                    return false;
+                    updateFirebaseStatus('offline', 'Tidak ada data tersimpan');
                 }
-            } catch (error) {
-                console.error('Error saving to cloud storage:', error);
-                return false;
             }
         }
 
-        // Load scores from cloud storage
-        async function loadFromCloud() {
-            if (!CLOUD_STORAGE.enabled) return false;
-            
-            try {
-                // Gunakan Firebase Realtime Database
-                const firebaseUrl = 'https://lacak-juang-rw6-default-rtdb.firebaseio.com/scores.json';
-                
-                const response = await fetch(firebaseUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data && data.scores) {
-                        scores = data.scores;
-                        console.log('Successfully loaded from cloud storage');
-                        return true;
-                    }
-                }
-                return false;
-            } catch (error) {
-                console.error('Error loading from cloud storage:', error);
-                return false;
-            }
-        }
-
-        // Sync to Google Sheets
-        async function syncToGoogleSheets() {
-            const teams = getTeamsData();
-            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxcdTk5FZIX4ol_DE1fxemiMtd_zq6Q6ge6ZDl0OhoOYpip1f8VnX8ABC-ynyNfX3VqFg/exec';
-            
-            try {
-                console.log('Syncing data to Google Sheets...', teams);
-                
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(teams)
-                });
-                
-                console.log('Successfully synced to Google Sheets');
-                return true;
-                
-            } catch (error) {
-                console.error('Error syncing to Google Sheets:', error);
-                return false;
-            }
-        }
-
-        // User credentials
-        const users = {
-            'admin': { password: 'admin', role: 'admin' },
-            'pospbb': { password: '12345', role: 'pos', pos: 'pbb', title: 'Pos PBB' },
-            'posemponempon': { password: '12345', role: 'pos', pos: 'emponempon', title: 'Pos Empon-empon' },
-            'possejarah': { password: '12345', role: 'pos', pos: 'sejarah', title: 'Pos Sejarah' },
-            'pospengetahuan': { password: '12345', role: 'pos', pos: 'pengetahuan', title: 'Pos Pengetahuan Umum' },
-            'posmakam': { password: '12345', role: 'pos', pos: 'makam', title: 'Pos Makam' },
-            'posoutbond': { password: '12345', role: 'pos', pos: 'outbond', title: 'Pos Outbond' },
-            'posinduk': { password: '12345', role: 'pos', pos: 'posinduk', title: 'Pos Induk' }
-        };
-
-        let currentUser = null;
-        let publicChart = null;
-        let adminChart = null;
-        let posChart = null;
-
-        // Initialize the application
+        // Initialize application
         async function init() {
             await loadScores();
             updateStandings();
-            createChart('scoresChart', 'publicChart');
+            createChart('scoresChart', 'public');
             
-            // Auto-refresh setiap 30 detik untuk sinkronisasi real-time
+            // Auto-refresh every 30 seconds
             setInterval(async () => {
                 if (!currentUser || currentUser.role !== 'pos') {
-                    // Hanya auto-refresh untuk public view dan admin
                     await loadScores();
                     updateStandings();
                 }
@@ -578,7 +502,7 @@
             document.getElementById('publicDashboard').classList.add('hidden');
             document.getElementById('adminDashboard').classList.remove('hidden');
             updateStandings();
-            createChart('adminScoresChart', 'adminChart');
+            createChart('adminScoresChart', 'admin');
         }
 
         // Show pos dashboard
@@ -607,7 +531,7 @@
                 const score = parseInt(scoreInput.value) || 0;
                 
                 if (score < 0 || score > 1000) {
-                    alert(`Skor Tim ${i} harus antara 0-1000!`);
+                    showMessage('saveMessage', 'error', `Skor Tim ${i} harus antara 0-1000!`);
                     hasError = true;
                     break;
                 }
@@ -616,32 +540,17 @@
 
             if (!hasError) {
                 scores[currentUser.pos] = posScores;
-                saveScoresToStorage();
                 
                 // Show saving message
-                const saveButton = document.querySelector('button[onclick="saveScores()"]');
-                const originalText = saveButton.textContent;
-                saveButton.textContent = 'Menyimpan...';
-                saveButton.disabled = true;
+                showMessage('saveMessage', 'loading', 'Menyimpan skor...');
                 
-                // Sync to Google Sheets
-                const syncSuccess = await syncToGoogleSheets();
+                const saved = await saveScoresToStorage();
                 
-                // Show success message
-                document.getElementById('saveSuccess').classList.remove('hidden');
-                if (syncSuccess) {
-                    document.getElementById('saveSuccess').innerHTML = 'Skor berhasil disimpan ke cloud dan Google Sheets! <a href="https://docs.google.com/spreadsheets/d/1e-Y0ckHjVF04la-I4e0j-WgR10KXKMxZKI2ox__5fWs/edit?usp=sharing" target="_blank" class="text-blue-600 underline">Lihat Spreadsheet</a>';
+                if (saved) {
+                    showMessage('saveMessage', 'success', 'Skor berhasil disimpan ke Firebase!');
                 } else {
-                    document.getElementById('saveSuccess').textContent = 'Skor berhasil disimpan ke cloud! (Sinkronisasi ke Google Sheets gagal)';
+                    showMessage('saveMessage', 'warning', 'Skor disimpan lokal - Firebase offline');
                 }
-                
-                // Reset button
-                saveButton.textContent = originalText;
-                saveButton.disabled = false;
-                
-                setTimeout(() => {
-                    document.getElementById('saveSuccess').classList.add('hidden');
-                }, 5000);
             }
         }
 
@@ -650,11 +559,138 @@
             updateStandings();
             document.getElementById('posResults').classList.remove('hidden');
             updatePosStandings();
-            createChart('posScoresChart', 'posChart');
+            createChart('posScoresChart', 'pos');
         }
 
-        // Update standings table
+        // Refresh data manually
+        async function refreshData() {
+            const button = document.querySelector('button[onclick="refreshData()"]');
+            const originalText = button.textContent;
+            
+            button.textContent = 'Memuat...';
+            button.disabled = true;
+            
+            await loadScores();
+            updateStandings();
+            
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+
+        // Export data to CSV
+        function exportData() {
+            const teams = getTeamsData();
+            let csvData = 'Peringkat,Tim,PBB,Empon-empon,Sejarah,Pengetahuan,Makam,Outbond,Pos Induk,Total\n';
+            
+            teams.forEach((team, index) => {
+                csvData += `${index + 1},Tim ${team.team},${team.pbb},${team.emponempon},${team.sejarah},${team.pengetahuan},${team.makam},${team.outbond},${team.posinduk},${team.total}\n`;
+            });
+
+            // Create download link
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lacak-juang-rw6-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showMessage('adminMessage', 'success', 'Data berhasil diexport!');
+        }
+
+        // Reset all scores
+        async function resetAllScores() {
+            if (confirm('Apakah Anda yakin ingin mereset semua skor? Tindakan ini tidak dapat dibatalkan!')) {
+                scores = {
+                    pbb: [0, 0, 0, 0, 0, 0],
+                    emponempon: [0, 0, 0, 0, 0, 0],
+                    sejarah: [0, 0, 0, 0, 0, 0],
+                    pengetahuan: [0, 0, 0, 0, 0, 0],
+                    makam: [0, 0, 0, 0, 0, 0],
+                    outbond: [0, 0, 0, 0, 0, 0],
+                    posinduk: [0, 0, 0, 0, 0, 0]
+                };
+                
+                showMessage('adminMessage', 'loading', 'Mereset semua skor...');
+                
+                const saved = await saveScoresToStorage();
+                updateStandings();
+                
+                if (saved) {
+                    showMessage('adminMessage', 'success', 'Semua skor berhasil direset!');
+                } else {
+                    showMessage('adminMessage', 'warning', 'Skor direset lokal - Firebase offline');
+                }
+            }
+        }
+
+        // Force sync to Firebase
+        async function forceSync() {
+            showMessage('adminMessage', 'loading', 'Memaksa sinkronisasi...');
+            
+            const saved = await saveToFirebase(scores);
+            
+            if (saved) {
+                showMessage('adminMessage', 'success', 'Sinkronisasi berhasil!');
+            } else {
+                showMessage('adminMessage', 'error', 'Sinkronisasi gagal!');
+            }
+        }
+
+        // Show message helper
+        function showMessage(elementId, type, message) {
+            const messageDiv = document.getElementById(elementId);
+            if (!messageDiv) return;
+            
+            messageDiv.className = 'mt-4 p-3 rounded text-center';
+            
+            switch(type) {
+                case 'success':
+                    messageDiv.classList.add('bg-green-100', 'text-green-700');
+                    break;
+                case 'error':
+                    messageDiv.classList.add('bg-red-100', 'text-red-700');
+                    break;
+                case 'warning':
+                    messageDiv.classList.add('bg-yellow-100', 'text-yellow-700');
+                    break;
+                case 'loading':
+                    messageDiv.classList.add('bg-blue-100', 'text-blue-700');
+                    break;
+            }
+            
+            messageDiv.textContent = message;
+            messageDiv.classList.remove('hidden');
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Update standings
         function updateStandings() {
+            const teams = getTeamsData();
+            
+            updatePodium(teams);
+            updateCategoryRankings();
+            updateCompetitionStats(teams);
+            updateStandingsTable('standingsTable', teams);
+            
+            if (!document.getElementById('adminDashboard').classList.contains('hidden')) {
+                updateStandingsTable('adminStandingsTable', teams);
+            }
+            
+            if (!document.getElementById('posResults').classList.contains('hidden')) {
+                updateStandingsTable('posStandingsTable', teams);
+            }
+            
+            updateCharts(teams);
+        }
+
+        // Get teams data
+        function getTeamsData() {
             const teams = [];
             
             for (let i = 0; i < 6; i++) {
@@ -674,36 +710,10 @@
                 });
             }
 
-            // Sort by total score (descending)
-            teams.sort((a, b) => b.total - a.total);
-
-            // Update podium
-            updatePodium(teams);
-            
-            // Update category rankings
-            updateCategoryRankings();
-            
-            // Update statistics
-            updateCompetitionStats(teams);
-
-            // Update public standings
-            updateStandingsTable('standingsTable', teams);
-            
-            // Update admin standings if visible
-            if (!document.getElementById('adminDashboard').classList.contains('hidden')) {
-                updateStandingsTable('adminStandingsTable', teams);
-            }
-
-            // Update pos standings if visible
-            if (!document.getElementById('posResults').classList.contains('hidden')) {
-                updateStandingsTable('posStandingsTable', teams);
-            }
-
-            // Update charts
-            updateCharts(teams);
+            return teams.sort((a, b) => b.total - a.total);
         }
 
-        // Update podium display
+        // Update podium
         function updatePodium(teams) {
             const podium = document.getElementById('podium');
             if (!podium) return;
@@ -784,7 +794,6 @@
                     });
                 }
                 
-                // Sort by category score (descending)
                 categoryTeams.sort((a, b) => b.score - a.score);
                 
                 const categoryCard = document.createElement('div');
@@ -833,45 +842,13 @@
             const competitionStats = document.getElementById('competitionStats');
             if (!competitionStats) return;
             
-            // Calculate statistics
             const totalScores = teams.map(team => team.total);
             const highestScore = Math.max(...totalScores);
             const lowestScore = Math.min(...totalScores);
             const averageScore = Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length);
             const scoreDifference = highestScore - lowestScore;
             
-            // Find leading team
             const leadingTeam = teams[0];
-            
-            // Find most competitive category (smallest score difference)
-            const categories = ['pbb', 'emponempon', 'sejarah', 'pengetahuan', 'makam', 'outbond', 'posinduk'];
-            let mostCompetitiveCategory = '';
-            let smallestDifference = Infinity;
-            
-            categories.forEach(category => {
-                const categoryScores = [];
-                for (let i = 0; i < 6; i++) {
-                    categoryScores.push(scores[category][i]);
-                }
-                const max = Math.max(...categoryScores);
-                const min = Math.min(...categoryScores);
-                const diff = max - min;
-                
-                if (diff < smallestDifference) {
-                    smallestDifference = diff;
-                    mostCompetitiveCategory = category;
-                }
-            });
-            
-            const categoryNames = {
-                'pbb': 'PBB',
-                'emponempon': 'Empon-empon',
-                'sejarah': 'Sejarah',
-                'pengetahuan': 'Pengetahuan',
-                'makam': 'Makam',
-                'outbond': 'Outbond',
-                'posinduk': 'Pos Induk'
-            };
             
             competitionStats.innerHTML = `
                 <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg p-4 text-center">
@@ -897,23 +874,24 @@
                 
                 <div class="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-4 text-center">
                     <div class="text-2xl mb-2">🔥</div>
-                    <div class="text-sm text-gray-600 mb-1">Kategori Terketat</div>
-                    <div class="font-bold text-sm text-purple-800">${categoryNames[mostCompetitiveCategory]}</div>
-                    <div class="text-xs text-purple-700">selisih ${smallestDifference} poin</div>
+                    <div class="text-sm text-gray-600 mb-1">Status Firebase</div>
+                    <div class="font-bold text-sm text-purple-800">${firebaseConnected ? 'Online' : 'Offline'}</div>
+                    <div class="text-xs text-purple-700">${firebaseConnected ? 'Real-time sync' : 'Local only'}</div>
                 </div>
             `;
         }
 
-        // Update specific standings table
+        // Update standings table
         function updateStandingsTable(tableId, teams) {
             const tbody = document.getElementById(tableId);
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
 
             teams.forEach((team, index) => {
                 const row = document.createElement('tr');
                 row.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
                 
-                // Add gold, silver, bronze styling for top 3
                 let rankClass = '';
                 if (index === 0) rankClass = 'bg-yellow-100 text-yellow-800 font-bold';
                 else if (index === 1) rankClass = 'bg-gray-100 text-gray-800 font-bold';
@@ -940,40 +918,19 @@
             updateStandingsTable('posStandingsTable', getTeamsData());
         }
 
-        // Get teams data
-        function getTeamsData() {
-            const teams = [];
-            
-            for (let i = 0; i < 6; i++) {
-                const total = scores.pbb[i] + scores.emponempon[i] + scores.sejarah[i] + 
-                             scores.pengetahuan[i] + scores.makam[i] + scores.outbond[i] + scores.posinduk[i];
-                
-                teams.push({
-                    team: i + 1,
-                    pbb: scores.pbb[i],
-                    emponempon: scores.emponempon[i],
-                    sejarah: scores.sejarah[i],
-                    pengetahuan: scores.pengetahuan[i],
-                    makam: scores.makam[i],
-                    outbond: scores.outbond[i],
-                    posinduk: scores.posinduk[i],
-                    total: total
-                });
-            }
-
-            return teams.sort((a, b) => b.total - a.total);
-        }
-
         // Create chart
-        function createChart(canvasId, chartVar) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
+        function createChart(canvasId, chartType) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
             
-            // Destroy existing chart if it exists
-            if (chartVar === 'publicChart' && publicChart) {
+            const context = ctx.getContext('2d');
+            
+            // Destroy existing chart
+            if (chartType === 'public' && publicChart) {
                 publicChart.destroy();
-            } else if (chartVar === 'adminChart' && adminChart) {
+            } else if (chartType === 'admin' && adminChart) {
                 adminChart.destroy();
-            } else if (chartVar === 'posChart' && posChart) {
+            } else if (chartType === 'pos' && posChart) {
                 posChart.destroy();
             }
 
@@ -981,7 +938,7 @@
             const labels = teams.map(team => `Tim ${team.team}`);
             const data = teams.map(team => team.total);
 
-            const chart = new Chart(ctx, {
+            const chart = new Chart(context, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -1004,20 +961,20 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 1000,
+                            max: 7000,
                             ticks: {
-                                stepSize: 100
+                                stepSize: 500
                             }
                         }
                     }
                 }
             });
 
-            if (chartVar === 'publicChart') {
+            if (chartType === 'public') {
                 publicChart = chart;
-            } else if (chartVar === 'adminChart') {
+            } else if (chartType === 'admin') {
                 adminChart = chart;
-            } else if (chartVar === 'posChart') {
+            } else if (chartType === 'pos') {
                 posChart = chart;
             }
         }
@@ -1046,93 +1003,6 @@
             }
         }
 
-        // Refresh scores from cloud
-        async function refreshScores() {
-            const refreshButton = document.querySelector('button[onclick="refreshScores()"]');
-            const originalText = refreshButton.textContent;
-            
-            refreshButton.textContent = 'Memuat...';
-            refreshButton.disabled = true;
-            
-            await loadScores();
-            updateStandings();
-            
-            refreshButton.textContent = originalText;
-            refreshButton.disabled = false;
-        }
-
-        // Manual sync for admin
-        async function manualSync() {
-            const syncButton = document.querySelector('button[onclick="manualSync()"]');
-            const syncStatus = document.getElementById('syncStatus');
-            
-            // Show loading
-            syncButton.textContent = 'Menyinkronkan...';
-            syncButton.disabled = true;
-            syncStatus.className = 'mb-4 p-3 rounded text-center bg-blue-100 text-blue-700';
-            syncStatus.textContent = 'Sedang menyinkronkan data ke Google Sheets...';
-            syncStatus.classList.remove('hidden');
-            
-            // Perform sync
-            const success = await syncToGoogleSheets();
-            
-            // Show result
-            if (success) {
-                syncStatus.className = 'mb-4 p-3 rounded text-center bg-green-100 text-green-700';
-                syncStatus.innerHTML = 'Berhasil disinkronkan ke Google Sheets! <a href="https://docs.google.com/spreadsheets/d/1e-Y0ckHjVF04la-I4e0j-WgR10KXKMxZKI2ox__5fWs/edit?usp=sharing" target="_blank" class="text-blue-600 underline">Lihat Spreadsheet</a>';
-            } else {
-                syncStatus.className = 'mb-4 p-3 rounded text-center bg-red-100 text-red-700';
-                syncStatus.textContent = 'Gagal menyinkronkan ke Google Sheets. Silakan coba lagi.';
-            }
-            
-            // Reset button
-            syncButton.textContent = 'Sync ke Google Sheets';
-            syncButton.disabled = false;
-            
-            // Hide status after 5 seconds
-            setTimeout(() => {
-                syncStatus.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Reset all scores (admin only)
-        async function resetAllScores() {
-            if (confirm('Apakah Anda yakin ingin mereset semua skor? Tindakan ini tidak dapat dibatalkan!')) {
-                scores = {
-                    pbb: [0, 0, 0, 0, 0, 0],
-                    emponempon: [0, 0, 0, 0, 0, 0],
-                    sejarah: [0, 0, 0, 0, 0, 0],
-                    pengetahuan: [0, 0, 0, 0, 0, 0],
-                    makam: [0, 0, 0, 0, 0, 0],
-                    outbond: [0, 0, 0, 0, 0, 0],
-                    posinduk: [0, 0, 0, 0, 0, 0]
-                };
-                saveScoresToStorage();
-                updateStandings();
-                
-                // Auto sync after reset
-                await syncToGoogleSheets();
-                alert('Semua skor telah direset dan disinkronkan ke Google Sheets!');
-            }
-        }
-
-        // Copy data to clipboard for spreadsheet
-        function copyToClipboard() {
-            const teams = getTeamsData();
-            let csvData = 'Peringkat,Tim,PBB,Empon-empon,Sejarah,Pengetahuan Umum,Makam,Outbond,Pos Induk,Total\n';
-            
-            teams.forEach((team, index) => {
-                csvData += `${index + 1},Tim ${team.team},${team.pbb},${team.emponempon},${team.sejarah},${team.pengetahuan},${team.makam},${team.outbond},${team.posinduk},${team.total}\n`;
-            });
-
-            navigator.clipboard.writeText(csvData).then(() => {
-                document.getElementById('copySuccess').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('copySuccess').classList.add('hidden');
-                }, 3000);
-            });
-        }
-
         // Logout
         function logout() {
             currentUser = null;
@@ -1143,8 +1013,8 @@
             updateStandings();
         }
 
-        // Initialize the application when page loads
+        // Initialize when page loads
         window.addEventListener('load', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f595f5c4ca44c7',t:'MTc1NTIyODMzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f5ca640495f8e2',t:'MTc1NTIzMDQ4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
