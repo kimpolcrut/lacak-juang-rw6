@@ -45,7 +45,7 @@
         <!-- Public Dashboard -->
         <div id="publicDashboard" class="space-y-8">
             <!-- Action Buttons -->
-            <div class="text-center space-x-4 mb-4">
+            <div class="text-center space-x-4">
                 <button onclick="showLogin()" class="bg-white hover:bg-gray-100 text-red-600 font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200">
                     Login Petugas
                 </button>
@@ -53,24 +53,10 @@
                     Refresh Skor
                 </button>
             </div>
-            
-            <!-- Cloud Status -->
-            <div class="text-center mb-4">
-                <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-lg text-sm">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                    Data tersinkron real-time antar perangkat
-                </div>
-            </div>
 
-            <!-- Overall Rankings -->
+            <!-- Current Standings -->
             <div class="bg-white rounded-lg shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">🏆 Klasemen Sementara</h2>
-                
-                <!-- Top 3 Podium -->
-                <div id="podium" class="mb-8">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-                
+                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">Klasemen Sementara</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead>
@@ -83,7 +69,6 @@
                                 <th class="px-4 py-3 text-center">Pengetahuan</th>
                                 <th class="px-4 py-3 text-center">Makam</th>
                                 <th class="px-4 py-3 text-center">Outbond</th>
-                                <th class="px-4 py-3 text-center">Pos Induk</th>
                                 <th class="px-4 py-3 text-center font-bold">Total</th>
                             </tr>
                         </thead>
@@ -91,22 +76,6 @@
                             <!-- Data will be populated by JavaScript -->
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Category Rankings -->
-            <div class="bg-white rounded-lg shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">📊 Peringkat Per Kategori</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="categoryRankings">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Statistics -->
-            <div class="bg-white rounded-lg shadow-xl p-6">
-                <h2 class="text-2xl font-bold text-red-600 mb-6 text-center">📈 Statistik Kompetisi</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="competitionStats">
-                    <!-- Will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -145,17 +114,12 @@
                     <div id="copySuccess" class="hidden mt-2 text-green-600 text-sm">Data berhasil dicopy ke clipboard!</div>
                 </div>
 
-                <!-- Sync and Reset Controls -->
-                <div class="mb-6 space-x-4">
-                    <button onclick="manualSync()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-                        Sync ke Google Sheets
-                    </button>
+                <!-- Reset Scores -->
+                <div class="mb-6">
                     <button onclick="resetAllScores()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
                         Reset Semua Skor
                     </button>
                 </div>
-                
-                <div id="syncStatus" class="hidden mb-4 p-3 rounded text-center"></div>
 
                 <!-- Same standings table and chart as public view -->
                 <div class="overflow-x-auto">
@@ -170,7 +134,6 @@
                                 <th class="px-4 py-3 text-center">Pengetahuan</th>
                                 <th class="px-4 py-3 text-center">Makam</th>
                                 <th class="px-4 py-3 text-center">Outbond</th>
-                                <th class="px-4 py-3 text-center">Pos Induk</th>
                                 <th class="px-4 py-3 text-center font-bold">Total</th>
                             </tr>
                         </thead>
@@ -243,39 +206,27 @@
             </div>
 
             <!-- Results View for Pos -->
-            <div id="posResults" class="hidden space-y-6">
-                <!-- Standings Table -->
-                <div class="bg-white rounded-lg shadow-xl p-6">
-                    <h3 class="text-xl font-bold text-red-600 mb-4">Hasil Penilaian</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full table-auto">
-                            <thead>
-                                <tr class="bg-red-600 text-white">
-                                    <th class="px-4 py-3 text-center">Peringkat</th>
-                                    <th class="px-4 py-3 text-center">Tim</th>
-                                    <th class="px-4 py-3 text-center">PBB</th>
-                                    <th class="px-4 py-3 text-center">Empon²</th>
-                                    <th class="px-4 py-3 text-center">Sejarah</th>
-                                    <th class="px-4 py-3 text-center">Pengetahuan</th>
-                                    <th class="px-4 py-3 text-center">Makam</th>
-                                    <th class="px-4 py-3 text-center">Outbond</th>
-                                    <th class="px-4 py-3 text-center">Pos Induk</th>
-                                    <th class="px-4 py-3 text-center font-bold">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="posStandingsTable">
-                                <!-- Data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Chart for Pos -->
-                <div class="bg-white rounded-lg shadow-xl p-6">
-                    <h3 class="text-xl font-bold text-red-600 mb-4">Grafik Klasemen Sementara</h3>
-                    <div class="relative h-80">
-                        <canvas id="posScoresChart"></canvas>
-                    </div>
+            <div id="posResults" class="hidden bg-white rounded-lg shadow-xl p-6">
+                <h3 class="text-xl font-bold text-red-600 mb-4">Hasil Penilaian</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr class="bg-red-600 text-white">
+                                <th class="px-4 py-3 text-center">Peringkat</th>
+                                <th class="px-4 py-3 text-center">Tim</th>
+                                <th class="px-4 py-3 text-center">PBB</th>
+                                <th class="px-4 py-3 text-center">Empon²</th>
+                                <th class="px-4 py-3 text-center">Sejarah</th>
+                                <th class="px-4 py-3 text-center">Pengetahuan</th>
+                                <th class="px-4 py-3 text-center">Makam</th>
+                                <th class="px-4 py-3 text-center">Outbond</th>
+                                <th class="px-4 py-3 text-center font-bold">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="posStandingsTable">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -289,121 +240,20 @@
             sejarah: [0, 0, 0, 0, 0, 0],
             pengetahuan: [0, 0, 0, 0, 0, 0],
             makam: [0, 0, 0, 0, 0, 0],
-            outbond: [0, 0, 0, 0, 0, 0],
-            posinduk: [0, 0, 0, 0, 0, 0]
+            outbond: [0, 0, 0, 0, 0, 0]
         };
 
-        // Load scores from localStorage and cloud
-        async function loadScores() {
-            // First try to load from cloud
-            const cloudLoaded = await loadFromCloud();
-            
-            if (!cloudLoaded) {
-                // Fallback to localStorage
-                const savedScores = localStorage.getItem('lacakJuangScores');
-                if (savedScores) {
-                    scores = JSON.parse(savedScores);
-                }
+        // Load scores from localStorage
+        function loadScores() {
+            const savedScores = localStorage.getItem('lacakJuangScores');
+            if (savedScores) {
+                scores = JSON.parse(savedScores);
             }
-            
-            // Always save to localStorage for offline access
-            saveScoresToStorage();
         }
 
-        // Save scores to localStorage and cloud
-        async function saveScoresToStorage() {
-            // Save to localStorage
+        // Save scores to localStorage
+        function saveScoresToStorage() {
             localStorage.setItem('lacakJuangScores', JSON.stringify(scores));
-            
-            // Save to cloud storage
-            await saveToCloud();
-        }
-
-        // Cloud storage configuration
-        const CLOUD_STORAGE = {
-            binId: '676a8e5ead19ca34f8c8f8a1',
-            apiKey: '$2a$10$8vF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4qF4',
-            baseUrl: 'https://api.jsonbin.io/v3/b/'
-        };
-
-        // Save scores to cloud storage
-        async function saveToCloud() {
-            try {
-                const response = await fetch(`${CLOUD_STORAGE.baseUrl}${CLOUD_STORAGE.binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': CLOUD_STORAGE.apiKey
-                    },
-                    body: JSON.stringify({
-                        scores: scores,
-                        lastUpdated: new Date().toISOString(),
-                        version: Date.now()
-                    })
-                });
-                
-                if (response.ok) {
-                    console.log('Successfully saved to cloud storage');
-                    return true;
-                } else {
-                    console.error('Failed to save to cloud storage');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error saving to cloud storage:', error);
-                return false;
-            }
-        }
-
-        // Load scores from cloud storage
-        async function loadFromCloud() {
-            try {
-                const response = await fetch(`${CLOUD_STORAGE.baseUrl}${CLOUD_STORAGE.binId}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': CLOUD_STORAGE.apiKey
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.record && data.record.scores) {
-                        scores = data.record.scores;
-                        console.log('Successfully loaded from cloud storage');
-                        return true;
-                    }
-                }
-                return false;
-            } catch (error) {
-                console.error('Error loading from cloud storage:', error);
-                return false;
-            }
-        }
-
-        // Sync to Google Sheets
-        async function syncToGoogleSheets() {
-            const teams = getTeamsData();
-            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxcdTk5FZIX4ol_DE1fxemiMtd_zq6Q6ge6ZDl0OhoOYpip1f8VnX8ABC-ynyNfX3VqFg/exec';
-            
-            try {
-                console.log('Syncing data to Google Sheets...', teams);
-                
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                    },
-                    body: JSON.stringify(teams)
-                });
-                
-                console.log('Successfully synced to Google Sheets');
-                return true;
-                
-            } catch (error) {
-                console.error('Error syncing to Google Sheets:', error);
-                return false;
-            }
         }
 
         // User credentials
@@ -414,18 +264,16 @@
             'possejarah': { password: '12345', role: 'pos', pos: 'sejarah', title: 'Pos Sejarah' },
             'pospengetahuan': { password: '12345', role: 'pos', pos: 'pengetahuan', title: 'Pos Pengetahuan Umum' },
             'posmakam': { password: '12345', role: 'pos', pos: 'makam', title: 'Pos Makam' },
-            'posoutbond': { password: '12345', role: 'pos', pos: 'outbond', title: 'Pos Outbond' },
-            'posinduk': { password: '12345', role: 'pos', pos: 'posinduk', title: 'Pos Induk' }
+            'posoutbond': { password: '12345', role: 'pos', pos: 'outbond', title: 'Pos Outbond' }
         };
 
         let currentUser = null;
         let publicChart = null;
         let adminChart = null;
-        let posChart = null;
 
         // Initialize the application
-        async function init() {
-            await loadScores();
+        function init() {
+            loadScores();
             updateStandings();
             createChart('scoresChart', 'publicChart');
         }
@@ -490,7 +338,7 @@
         }
 
         // Save scores from pos
-        async function saveScores() {
+        function saveScores() {
             const posScores = [];
             let hasError = false;
 
@@ -509,31 +357,10 @@
             if (!hasError) {
                 scores[currentUser.pos] = posScores;
                 saveScoresToStorage();
-                
-                // Show saving message
-                const saveButton = document.querySelector('button[onclick="saveScores()"]');
-                const originalText = saveButton.textContent;
-                saveButton.textContent = 'Menyimpan...';
-                saveButton.disabled = true;
-                
-                // Sync to Google Sheets
-                const syncSuccess = await syncToGoogleSheets();
-                
-                // Show success message
                 document.getElementById('saveSuccess').classList.remove('hidden');
-                if (syncSuccess) {
-                    document.getElementById('saveSuccess').innerHTML = 'Skor berhasil disimpan ke cloud dan Google Sheets! <a href="https://docs.google.com/spreadsheets/d/1e-Y0ckHjVF04la-I4e0j-WgR10KXKMxZKI2ox__5fWs/edit?usp=sharing" target="_blank" class="text-blue-600 underline">Lihat Spreadsheet</a>';
-                } else {
-                    document.getElementById('saveSuccess').textContent = 'Skor berhasil disimpan ke cloud! (Sinkronisasi ke Google Sheets gagal)';
-                }
-                
-                // Reset button
-                saveButton.textContent = originalText;
-                saveButton.disabled = false;
-                
                 setTimeout(() => {
                     document.getElementById('saveSuccess').classList.add('hidden');
-                }, 5000);
+                }, 3000);
             }
         }
 
@@ -542,7 +369,6 @@
             updateStandings();
             document.getElementById('posResults').classList.remove('hidden');
             updatePosStandings();
-            createChart('posScoresChart', 'posChart');
         }
 
         // Update standings table
@@ -551,7 +377,7 @@
             
             for (let i = 0; i < 6; i++) {
                 const total = scores.pbb[i] + scores.emponempon[i] + scores.sejarah[i] + 
-                             scores.pengetahuan[i] + scores.makam[i] + scores.outbond[i] + scores.posinduk[i];
+                             scores.pengetahuan[i] + scores.makam[i] + scores.outbond[i];
                 
                 teams.push({
                     team: i + 1,
@@ -561,22 +387,12 @@
                     pengetahuan: scores.pengetahuan[i],
                     makam: scores.makam[i],
                     outbond: scores.outbond[i],
-                    posinduk: scores.posinduk[i],
                     total: total
                 });
             }
 
             // Sort by total score (descending)
             teams.sort((a, b) => b.total - a.total);
-
-            // Update podium
-            updatePodium(teams);
-            
-            // Update category rankings
-            updateCategoryRankings();
-            
-            // Update statistics
-            updateCompetitionStats(teams);
 
             // Update public standings
             updateStandingsTable('standingsTable', teams);
@@ -593,207 +409,6 @@
 
             // Update charts
             updateCharts(teams);
-        }
-
-        // Update podium display
-        function updatePodium(teams) {
-            const podium = document.getElementById('podium');
-            if (!podium) return;
-            
-            const top3 = teams.slice(0, 3);
-            
-            podium.innerHTML = `
-                <div class="flex justify-center items-end space-x-4 mb-6">
-                    <!-- 2nd Place -->
-                    <div class="text-center">
-                        <div class="bg-gray-300 rounded-lg p-4 h-24 flex items-center justify-center mb-2">
-                            <div class="text-center">
-                                <div class="text-2xl">🥈</div>
-                                <div class="font-bold text-gray-700">Tim ${top3[1] ? top3[1].team : '-'}</div>
-                                <div class="text-sm text-gray-600">${top3[1] ? top3[1].total : 0} poin</div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-400 h-16 rounded-t-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">2</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 1st Place -->
-                    <div class="text-center">
-                        <div class="bg-yellow-300 rounded-lg p-4 h-32 flex items-center justify-center mb-2">
-                            <div class="text-center">
-                                <div class="text-3xl">🥇</div>
-                                <div class="font-bold text-yellow-800">Tim ${top3[0] ? top3[0].team : '-'}</div>
-                                <div class="text-sm text-yellow-700">${top3[0] ? top3[0].total : 0} poin</div>
-                            </div>
-                        </div>
-                        <div class="bg-yellow-500 h-20 rounded-t-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-xl">1</span>
-                        </div>
-                    </div>
-                    
-                    <!-- 3rd Place -->
-                    <div class="text-center">
-                        <div class="bg-orange-300 rounded-lg p-4 h-20 flex items-center justify-center mb-2">
-                            <div class="text-center">
-                                <div class="text-xl">🥉</div>
-                                <div class="font-bold text-orange-800">Tim ${top3[2] ? top3[2].team : '-'}</div>
-                                <div class="text-sm text-orange-700">${top3[2] ? top3[2].total : 0} poin</div>
-                            </div>
-                        </div>
-                        <div class="bg-orange-500 h-12 rounded-t-lg flex items-center justify-center">
-                            <span class="text-white font-bold">3</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Update category rankings
-        function updateCategoryRankings() {
-            const categoryRankings = document.getElementById('categoryRankings');
-            if (!categoryRankings) return;
-            
-            const categories = [
-                { key: 'pbb', name: 'PBB', icon: '🎖️' },
-                { key: 'emponempon', name: 'Empon-empon', icon: '🌿' },
-                { key: 'sejarah', name: 'Sejarah', icon: '📚' },
-                { key: 'pengetahuan', name: 'Pengetahuan', icon: '🧠' },
-                { key: 'makam', name: 'Makam', icon: '🕊️' },
-                { key: 'outbond', name: 'Outbond', icon: '🏃' },
-                { key: 'posinduk', name: 'Pos Induk', icon: '🏠' }
-            ];
-
-            categoryRankings.innerHTML = '';
-
-            categories.forEach(category => {
-                const categoryTeams = [];
-                
-                for (let i = 0; i < 6; i++) {
-                    categoryTeams.push({
-                        team: i + 1,
-                        score: scores[category.key][i]
-                    });
-                }
-                
-                // Sort by category score (descending)
-                categoryTeams.sort((a, b) => b.score - a.score);
-                
-                const categoryCard = document.createElement('div');
-                categoryCard.className = 'bg-gray-50 rounded-lg p-4';
-                
-                let rankingList = '';
-                categoryTeams.forEach((team, index) => {
-                    let rankClass = '';
-                    let medal = '';
-                    
-                    if (index === 0) {
-                        rankClass = 'text-yellow-600 font-bold';
-                        medal = '🥇';
-                    } else if (index === 1) {
-                        rankClass = 'text-gray-600 font-bold';
-                        medal = '🥈';
-                    } else if (index === 2) {
-                        rankClass = 'text-orange-600 font-bold';
-                        medal = '🥉';
-                    }
-                    
-                    rankingList += `
-                        <div class="flex justify-between items-center py-1 ${rankClass}">
-                            <span>${medal} ${index + 1}. Tim ${team.team}</span>
-                            <span class="font-bold">${team.score}</span>
-                        </div>
-                    `;
-                });
-                
-                categoryCard.innerHTML = `
-                    <div class="text-center mb-3">
-                        <div class="text-2xl mb-1">${category.icon}</div>
-                        <h3 class="font-bold text-gray-700">${category.name}</h3>
-                    </div>
-                    <div class="space-y-1">
-                        ${rankingList}
-                    </div>
-                `;
-                
-                categoryRankings.appendChild(categoryCard);
-            });
-        }
-
-        // Update competition statistics
-        function updateCompetitionStats(teams) {
-            const competitionStats = document.getElementById('competitionStats');
-            if (!competitionStats) return;
-            
-            // Calculate statistics
-            const totalScores = teams.map(team => team.total);
-            const highestScore = Math.max(...totalScores);
-            const lowestScore = Math.min(...totalScores);
-            const averageScore = Math.round(totalScores.reduce((a, b) => a + b, 0) / totalScores.length);
-            const scoreDifference = highestScore - lowestScore;
-            
-            // Find leading team
-            const leadingTeam = teams[0];
-            
-            // Find most competitive category (smallest score difference)
-            const categories = ['pbb', 'emponempon', 'sejarah', 'pengetahuan', 'makam', 'outbond', 'posinduk'];
-            let mostCompetitiveCategory = '';
-            let smallestDifference = Infinity;
-            
-            categories.forEach(category => {
-                const categoryScores = [];
-                for (let i = 0; i < 6; i++) {
-                    categoryScores.push(scores[category][i]);
-                }
-                const max = Math.max(...categoryScores);
-                const min = Math.min(...categoryScores);
-                const diff = max - min;
-                
-                if (diff < smallestDifference) {
-                    smallestDifference = diff;
-                    mostCompetitiveCategory = category;
-                }
-            });
-            
-            const categoryNames = {
-                'pbb': 'PBB',
-                'emponempon': 'Empon-empon',
-                'sejarah': 'Sejarah',
-                'pengetahuan': 'Pengetahuan',
-                'makam': 'Makam',
-                'outbond': 'Outbond',
-                'posinduk': 'Pos Induk'
-            };
-            
-            competitionStats.innerHTML = `
-                <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🏆</div>
-                    <div class="text-sm text-gray-600 mb-1">Tim Terdepan</div>
-                    <div class="font-bold text-lg text-yellow-800">Tim ${leadingTeam.team}</div>
-                    <div class="text-sm text-yellow-700">${leadingTeam.total} poin</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4 text-center">
-                    <div class="text-2xl mb-2">📊</div>
-                    <div class="text-sm text-gray-600 mb-1">Skor Rata-rata</div>
-                    <div class="font-bold text-lg text-blue-800">${averageScore}</div>
-                    <div class="text-sm text-blue-700">poin</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-green-100 to-green-200 rounded-lg p-4 text-center">
-                    <div class="text-2xl mb-2">⚔️</div>
-                    <div class="text-sm text-gray-600 mb-1">Selisih Skor</div>
-                    <div class="font-bold text-lg text-green-800">${scoreDifference}</div>
-                    <div class="text-sm text-green-700">poin</div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🔥</div>
-                    <div class="text-sm text-gray-600 mb-1">Kategori Terketat</div>
-                    <div class="font-bold text-sm text-purple-800">${categoryNames[mostCompetitiveCategory]}</div>
-                    <div class="text-xs text-purple-700">selisih ${smallestDifference} poin</div>
-                </div>
-            `;
         }
 
         // Update specific standings table
@@ -820,7 +435,6 @@
                     <td class="px-4 py-3 text-center">${team.pengetahuan}</td>
                     <td class="px-4 py-3 text-center">${team.makam}</td>
                     <td class="px-4 py-3 text-center">${team.outbond}</td>
-                    <td class="px-4 py-3 text-center">${team.posinduk}</td>
                     <td class="px-4 py-3 text-center font-bold text-red-600">${team.total}</td>
                 `;
                 tbody.appendChild(row);
@@ -838,7 +452,7 @@
             
             for (let i = 0; i < 6; i++) {
                 const total = scores.pbb[i] + scores.emponempon[i] + scores.sejarah[i] + 
-                             scores.pengetahuan[i] + scores.makam[i] + scores.outbond[i] + scores.posinduk[i];
+                             scores.pengetahuan[i] + scores.makam[i] + scores.outbond[i];
                 
                 teams.push({
                     team: i + 1,
@@ -848,7 +462,6 @@
                     pengetahuan: scores.pengetahuan[i],
                     makam: scores.makam[i],
                     outbond: scores.outbond[i],
-                    posinduk: scores.posinduk[i],
                     total: total
                 });
             }
@@ -865,8 +478,6 @@
                 publicChart.destroy();
             } else if (chartVar === 'adminChart' && adminChart) {
                 adminChart.destroy();
-            } else if (chartVar === 'posChart' && posChart) {
-                posChart.destroy();
             }
 
             const teams = getTeamsData();
@@ -896,9 +507,9 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 1000,
+                            max: 6000,
                             ticks: {
-                                stepSize: 100
+                                stepSize: 500
                             }
                         }
                     }
@@ -909,8 +520,6 @@
                 publicChart = chart;
             } else if (chartVar === 'adminChart') {
                 adminChart = chart;
-            } else if (chartVar === 'posChart') {
-                posChart = chart;
             }
         }
 
@@ -930,65 +539,15 @@
                 adminChart.data.datasets[0].data = data;
                 adminChart.update();
             }
-
-            if (posChart) {
-                posChart.data.labels = labels;
-                posChart.data.datasets[0].data = data;
-                posChart.update();
-            }
         }
 
-        // Refresh scores from cloud
-        async function refreshScores() {
-            const refreshButton = document.querySelector('button[onclick="refreshScores()"]');
-            const originalText = refreshButton.textContent;
-            
-            refreshButton.textContent = 'Memuat...';
-            refreshButton.disabled = true;
-            
-            await loadScores();
+        // Refresh scores
+        function refreshScores() {
             updateStandings();
-            
-            refreshButton.textContent = originalText;
-            refreshButton.disabled = false;
-        }
-
-        // Manual sync for admin
-        async function manualSync() {
-            const syncButton = document.querySelector('button[onclick="manualSync()"]');
-            const syncStatus = document.getElementById('syncStatus');
-            
-            // Show loading
-            syncButton.textContent = 'Menyinkronkan...';
-            syncButton.disabled = true;
-            syncStatus.className = 'mb-4 p-3 rounded text-center bg-blue-100 text-blue-700';
-            syncStatus.textContent = 'Sedang menyinkronkan data ke Google Sheets...';
-            syncStatus.classList.remove('hidden');
-            
-            // Perform sync
-            const success = await syncToGoogleSheets();
-            
-            // Show result
-            if (success) {
-                syncStatus.className = 'mb-4 p-3 rounded text-center bg-green-100 text-green-700';
-                syncStatus.innerHTML = 'Berhasil disinkronkan ke Google Sheets! <a href="https://docs.google.com/spreadsheets/d/1e-Y0ckHjVF04la-I4e0j-WgR10KXKMxZKI2ox__5fWs/edit?usp=sharing" target="_blank" class="text-blue-600 underline">Lihat Spreadsheet</a>';
-            } else {
-                syncStatus.className = 'mb-4 p-3 rounded text-center bg-red-100 text-red-700';
-                syncStatus.textContent = 'Gagal menyinkronkan ke Google Sheets. Silakan coba lagi.';
-            }
-            
-            // Reset button
-            syncButton.textContent = 'Sync ke Google Sheets';
-            syncButton.disabled = false;
-            
-            // Hide status after 5 seconds
-            setTimeout(() => {
-                syncStatus.classList.add('hidden');
-            }, 5000);
         }
 
         // Reset all scores (admin only)
-        async function resetAllScores() {
+        function resetAllScores() {
             if (confirm('Apakah Anda yakin ingin mereset semua skor? Tindakan ini tidak dapat dibatalkan!')) {
                 scores = {
                     pbb: [0, 0, 0, 0, 0, 0],
@@ -996,25 +555,21 @@
                     sejarah: [0, 0, 0, 0, 0, 0],
                     pengetahuan: [0, 0, 0, 0, 0, 0],
                     makam: [0, 0, 0, 0, 0, 0],
-                    outbond: [0, 0, 0, 0, 0, 0],
-                    posinduk: [0, 0, 0, 0, 0, 0]
+                    outbond: [0, 0, 0, 0, 0, 0]
                 };
                 saveScoresToStorage();
                 updateStandings();
-                
-                // Auto sync after reset
-                await syncToGoogleSheets();
-                alert('Semua skor telah direset dan disinkronkan ke Google Sheets!');
+                alert('Semua skor telah direset!');
             }
         }
 
         // Copy data to clipboard for spreadsheet
         function copyToClipboard() {
             const teams = getTeamsData();
-            let csvData = 'Peringkat,Tim,PBB,Empon-empon,Sejarah,Pengetahuan Umum,Makam,Outbond,Pos Induk,Total\n';
+            let csvData = 'Peringkat,Tim,PBB,Empon-empon,Sejarah,Pengetahuan Umum,Makam,Outbond,Total\n';
             
             teams.forEach((team, index) => {
-                csvData += `${index + 1},Tim ${team.team},${team.pbb},${team.emponempon},${team.sejarah},${team.pengetahuan},${team.makam},${team.outbond},${team.posinduk},${team.total}\n`;
+                csvData += `${index + 1},Tim ${team.team},${team.pbb},${team.emponempon},${team.sejarah},${team.pengetahuan},${team.makam},${team.outbond},${team.total}\n`;
             });
 
             navigator.clipboard.writeText(csvData).then(() => {
@@ -1038,5 +593,5 @@
         // Initialize the application when page loads
         window.addEventListener('load', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f5619b637d3e1d',t:'MTc1NTIyNjE5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f5917772454030',t:'MTc1NTIyODE1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
